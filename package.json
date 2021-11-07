@@ -1,0 +1,35 @@
+{
+  "name": "filesrocket-local",
+  "version": "0.1.1",
+  "description": "filesrocket-local is a Nodejs package that allows file management on your own server.",
+  "main": "lib/index.js",
+  "types": "lib",
+  "author": {
+    "name": "Ivan Zaldivar",
+    "email": "ivanzaldivar16@gmail.com",
+    "url": "https://github.com/IvanZM123"
+  },
+  "repository": {
+    "url": "https://github.com/IvanZM123/filesrocket-local"
+  },
+  "keywords": [
+    "filemanager",
+    "filemanagement",
+    "upload",
+    "storage",
+    "files"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "serve": "nodemon",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "http-errors": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/http-errors": "^1.8.1",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  }
+}

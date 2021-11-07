@@ -25,6 +25,7 @@
     "build": "tsc -p ."
   },
   "dependencies": {
+    "filesrocket": "^0.1.4",
     "http-errors": "^1.8.0"
   },
   "devDependencies": {

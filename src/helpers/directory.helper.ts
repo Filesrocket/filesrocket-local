@@ -1,12 +1,12 @@
 import { InternalServerError, NotFound } from "http-errors";
 import { Query, ServiceMethods } from "filesrocket";
-import { access, mkdir, readdir, rmdir } from "fs";
+import { access, mkdir, readdir, rm } from "fs";
 import { promisify } from "util";
 import { resolve } from "path";
 
 const readdirAsync = promisify(readdir);
 const mkdirAsync = promisify(mkdir);
-const rmdirAsync = promisify(rmdir);
+const rmAsync = promisify(rm);
 
 export class DirectoryHelper implements Partial<ServiceMethods<string, string>> {
   /**
@@ -36,13 +36,12 @@ export class DirectoryHelper implements Partial<ServiceMethods<string, string>> 
     return readdirAsync(root);
   }
 
-  async remove(path: string): Promise<string> {
+  async remove(path: string, query: Query): Promise<string> {
     const isExist = await this.hasExist(path);
     if (!isExist) throw new NotFound("The directory does not exist.");
 
     const root: string = resolve(path);
-    console.log(root);
-    await rmdirAsync(root);
+    await rmAsync(root, { recursive: Boolean(query.bulk) });
     return root;
   }
 

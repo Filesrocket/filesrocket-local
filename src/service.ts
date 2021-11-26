@@ -26,11 +26,6 @@ export class LocalRocketService implements Partial<ServiceMethods<Payload, Resul
     this.directoryHelper.create(options.directory);
   }
 
-  /**
-   * Responsable method of upload file.
-   * @param data Payload
-   * @param query Additonal params.
-   */
   async create(data: Payload, query: Query): Promise<Result> {
     return new Promise(async (success, failure) => {
       // Generate random filename.
@@ -59,10 +54,6 @@ export class LocalRocketService implements Partial<ServiceMethods<Payload, Resul
     });
   }
 
-/**
- * Gets a list of paginated files.
- * @param query Params
-   */
   async list(query: Query): Promise<Paginated<Result>> {
     const { pagination, directory } = this.options;
     let { size, page, path = "" } = query;
@@ -82,33 +73,30 @@ export class LocalRocketService implements Partial<ServiceMethods<Payload, Resul
     }) as Paginated<Result>;
   }
 
-  /**
-   * Get a one file.
-   * @param path File path.
-   */
   async get(path: string): Promise<Result> {
     const isExist = await this.directoryHelper.hasExist(path);
     if (!isExist) throw new NotFound("The file does not exist.");
 
     const root: string = resolve(path);
-    const { base: name, ext, dir } = parse(root);
+    const { base: filename, ext, dir } = parse(root);
 
     const regex = new RegExp(`${ this.options.directory }.+`, "g");
     const [directory]: string[] = dir.match(regex) || [this.options.directory];
-    const chunkDir: string = directory.split(sep).join("/");
+    const chunks: string[] = directory.split(sep);
 
-    const url: string = `${ this.options.host }/${ chunkDir }/${ name }`;
-
-    const { size, birthtime: createdAt, atime: updatedAt } = await statAsync(root);
-    return { name, ext, url, size, dir: chunkDir, createdAt, updatedAt };
+    const stat = await statAsync(root);
+    return {
+      name: filename,
+      ext,
+      url: `${ this.options.host }/${ chunks.join("/") }/${ filename }`,
+      size: stat.size,
+      dir: chunks.slice(1, chunks.length).join("/"),
+      createdAt: stat.birthtime,
+      updatedAt: stat.atime
+    };
   }
 
-  /**
-   * Remove a file.
-   * @param path File path.
-   * @param query Params.
-   */
-  async remove(path: string, _: Query) {
+  async remove(path: string, query: Query) {
     const regex = new RegExp(`${ this.options.directory }.+`, "g");
     const [dir] = path.match(regex) || [""];
     const fullpath: string = resolve(dir);
@@ -116,14 +104,14 @@ export class LocalRocketService implements Partial<ServiceMethods<Payload, Resul
     // Get file before remove.
     const file = await this.get(fullpath);
 
+    // Remove directory.
+    if (!file.ext) {
+      await this.directoryHelper.remove(fullpath, query);
+      return file;
+    }
+
     // Remove file.
     await unlinkAsync(fullpath);
-
-    // Remove directory if empty.
-    this.directoryHelper.list({ path: file.dir })
-      .then(items => {
-        if (!items.length) this.directoryHelper.remove(file.dir);
-      });
     return file;
   }
 }

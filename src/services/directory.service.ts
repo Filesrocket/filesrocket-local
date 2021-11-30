@@ -4,9 +4,9 @@ import { access, mkdir, readdir, statSync, Stats, rmdir } from "fs";
 import { promisify } from "util";
 import { resolve } from "path";
 
-import { paginate } from "../helpers/general.helper";
 import { LocalOptions } from "../declarations";
 import { BaseService } from "./base.service";
+import { paginate } from "../helpers";
 
 const readdirAsync = promisify(readdir);
 const mkdirAsync = promisify(mkdir);
@@ -15,12 +15,13 @@ const rmdirAsync = promisify(rmdir);
 export class DirectoryService extends BaseService implements Partial<ServiceMethods<DataDir>> {
   constructor(options: LocalOptions) {
     super(options);
+    this.create({ path: "" });
   }
 
   async create(data: DataDir): Promise<DataResult> {
     const { directory } = this.options;
 
-    const path: string = resolve(`${ directory }/${ data.name }`);
+    const path: string = resolve(`${ directory }/${ data.path }`);
     const isExist: boolean = await this.hasExist(path);
     if (isExist) return this.builder(path);
 

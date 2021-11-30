@@ -1,42 +1,34 @@
-import {
-  ServiceMethods,
-  Paginated,
-  DataFile,
-  DataResult,
-  Query
-} from "filesrocket";
+import { ServiceMethods, Paginated,  DataFile, DataResult, Query, DataDir } from "filesrocket";
+import { createWriteStream, stat, unlink, readdir, statSync } from "fs";
 import { ParseFilename } from "filesrocket/lib/common";
-import { createWriteStream, stat, unlink } from "fs";
 import { resolve, parse, sep } from "path";
-import { NotFound } from "http-errors";
 import { promisify } from "util";
 
+const readdirAsync = promisify(readdir);
 const unlinkAsync = promisify(unlink);
 const statAsync = promisify(stat);
 
-import { DirectoryHelper } from "../helpers/directory.helper";
-import { paginate } from "../helpers/general.helper";
+import { DirectoryService } from "./directory.service";
 import { LocalOptions } from "../index";
+import { paginate } from "../helpers";
 
 export class FileService implements Partial<ServiceMethods> {
-  protected directoryHelper: DirectoryHelper;
+  protected directoryService: ServiceMethods<DataDir>;
 
   constructor(protected readonly options: LocalOptions) {
-    this.directoryHelper = new DirectoryHelper();
-    this.directoryHelper.create(options.directory);
+    this.directoryService = new DirectoryService(options);
   }
 
   @ParseFilename()
-  async create(data: DataFile, query: Query): Promise<DataResult> {
+  async create(data: DataFile, query: Query = {}): Promise<DataResult> {
     return new Promise(async (success, failure) => {
-      // Create directory.
-      const dir: string = await this.directoryHelper.create(
-        `${ this.options.directory }/${ query.path || "" }`
-      );
-      
+      const { path = "" } = query;
+      await this.directoryService.create({ path });
+
       // Fullpath.
-      const fullpath: string = resolve(dir, data.filename);
-      
+      const { directory: folder } = this.options;
+      const fullpath: string = resolve(folder, path, data.filename);
+
       // Generate writable.
       const writable = createWriteStream(fullpath);
 
@@ -45,6 +37,7 @@ export class FileService implements Partial<ServiceMethods> {
         const data = await this.get(fullpath);
         success(data);
       });
+
       writable.on("error", err => failure(err));
 
       // Write binary.
@@ -57,14 +50,20 @@ export class FileService implements Partial<ServiceMethods> {
     let { size, page, path = "" } = query;
 
     const dir: string = resolve(`${ directory }/${ path }`);
-    const items: string[] = await this.directoryHelper.list({ path: dir });
-    
-    size = pagination.max >= size ? size : pagination.default;
-    const paginatedItems: Paginated<unknown> = paginate(items, size, page);
+    const items: string[] = await readdirAsync(dir);
 
-    const files: DataResult[] = await Promise.all(
-      paginatedItems.items.map((item) => this.get(`${ dir }/${ item }`))
-    );
+    const filtered: string[] = items.filter(item => {
+      const stat = statSync(`${dir}/${item}`);
+      return stat.isFile();
+    });
+    
+    const length: number = pagination.max >= size ? size : pagination.default;
+    const paginatedItems: Paginated<unknown> = paginate(filtered, length, page);
+
+    const mapped: Promise<DataResult>[] = paginatedItems.items.map((item) => {
+      return this.get(`${ dir }/${ item }`);
+    });
+    const files: DataResult[] = await Promise.all(mapped);
 
     return Object.defineProperty(paginatedItems, "items", {
       value: files
@@ -72,17 +71,16 @@ export class FileService implements Partial<ServiceMethods> {
   }
 
   async get(path: string): Promise<DataResult> {
-    const isExist = await this.directoryHelper.hasExist(path);
-    if (!isExist) throw new NotFound("The file does not exist.");
-
     const root: string = resolve(path);
+    const { directory: folder } = this.options;
     const { base: filename, ext, dir } = parse(root);
 
-    const regex = new RegExp(`${ this.options.directory }.+`, "g");
-    const [directory]: string[] = dir.match(regex) || [this.options.directory];
-    const chunks: string[] = directory.split(sep);
+    const regex = new RegExp(`${ folder }.+`, "g");
+    const [directory]: string[] = dir.match(regex) || [folder];
 
+    const chunks: string[] = directory.split(sep);
     const stat = await statAsync(root);
+
     return {
       name: filename,
       ext,
@@ -94,19 +92,15 @@ export class FileService implements Partial<ServiceMethods> {
     };
   }
 
-  async remove(path: string, query: Query) {
-    const regex = new RegExp(`${ this.options.directory }.+`, "g");
+  async remove(path: string): Promise<DataResult> {
+    const { directory } = this.options;
+    const regex = new RegExp(`${ directory }.+`, "g");
+
     const [dir] = path.match(regex) || [""];
     const fullpath: string = resolve(dir);
 
     // Get file before remove.
     const file = await this.get(fullpath);
-
-    // Remove directory.
-    if (!file.ext) {
-      await this.directoryHelper.remove(fullpath, query);
-      return file;
-    }
 
     // Remove file.
     await unlinkAsync(fullpath);

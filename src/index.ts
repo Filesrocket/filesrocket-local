@@ -1,2 +1,2 @@
-export { LocalRocketService } from "./service";
 export * from "./declarations";
+export * from "./service";

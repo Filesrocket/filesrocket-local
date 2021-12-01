@@ -26,7 +26,7 @@ export class BaseService {
       ext,
       url: `${ host }/${ chunks.join("/") }/${ filename }`,
       size: stat.size,
-      dir: chunks.slice(1, chunks.length).join("/"),
+      dir: chunks.join("/"),
       createdAt: stat.birthtime,
       updatedAt: stat.atime
     };

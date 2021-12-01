@@ -1,6 +1,6 @@
 {
   "name": "filesrocket-local",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "filesrocket-local is a Nodejs package that allows file management on your own server.",
   "main": "lib/index.js",
   "types": "lib",

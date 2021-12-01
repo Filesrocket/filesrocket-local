@@ -49,7 +49,7 @@ export class DirectoryService extends BaseService implements Partial<ServiceMeth
     let itemsPaginated: Paginated<unknown> = paginate(filtered, length, page);
 
     const directories: DataResult[] = await Promise.all(
-      itemsPaginated.items.map((item) => this.get(item as string))
+      itemsPaginated.items.map((item) => this.get(`${ path }/${ item }`))
     );
 
     return Object.defineProperty(itemsPaginated, "items", {

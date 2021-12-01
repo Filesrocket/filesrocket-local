@@ -1,21 +1,22 @@
 import { ServiceMethods, Paginated,  DataFile, DataResult, Query, DataDir } from "filesrocket";
-import { createWriteStream, stat, unlink, readdir, statSync } from "fs";
+import { createWriteStream, unlink, readdir, statSync } from "fs";
 import { ParseFilename } from "filesrocket/lib/common";
-import { resolve, parse, sep } from "path";
 import { promisify } from "util";
+import { resolve } from "path";
 
 const readdirAsync = promisify(readdir);
 const unlinkAsync = promisify(unlink);
-const statAsync = promisify(stat);
 
 import { DirectoryService } from "./directory.service";
 import { LocalOptions } from "../index";
 import { paginate } from "../helpers";
+import { BaseService } from "./base.service";
 
-export class FileService implements Partial<ServiceMethods> {
+export class FileService extends BaseService implements Partial<ServiceMethods> {
   protected directoryService: ServiceMethods<DataDir>;
 
   constructor(protected readonly options: LocalOptions) {
+    super(options);
     this.directoryService = new DirectoryService(options);
   }
 
@@ -29,7 +30,6 @@ export class FileService implements Partial<ServiceMethods> {
       const { directory: folder } = this.options;
       const fullpath: string = resolve(folder, path, data.filename);
 
-      // Generate writable.
       const writable = createWriteStream(fullpath);
 
       // Listening events.
@@ -40,7 +40,6 @@ export class FileService implements Partial<ServiceMethods> {
 
       writable.on("error", err => failure(err));
 
-      // Write binary.
       data.file.pipe(writable);
     });
   }
@@ -72,24 +71,7 @@ export class FileService implements Partial<ServiceMethods> {
 
   async get(path: string): Promise<DataResult> {
     const root: string = resolve(path);
-    const { directory: folder } = this.options;
-    const { base: filename, ext, dir } = parse(root);
-
-    const regex = new RegExp(`${ folder }.+`, "g");
-    const [directory]: string[] = dir.match(regex) || [folder];
-
-    const chunks: string[] = directory.split(sep);
-    const stat = await statAsync(root);
-
-    return {
-      name: filename,
-      ext,
-      url: `${ this.options.host }/${ chunks.join("/") }/${ filename }`,
-      size: stat.size,
-      dir: chunks.slice(1, chunks.length).join("/"),
-      createdAt: stat.birthtime,
-      updatedAt: stat.atime
-    };
+    return this.builder(root);
   }
 
   async remove(path: string): Promise<DataResult> {
@@ -102,7 +84,6 @@ export class FileService implements Partial<ServiceMethods> {
     // Get file before remove.
     const file = await this.get(fullpath);
 
-    // Remove file.
     await unlinkAsync(fullpath);
     return file;
   }

@@ -1,5 +1,5 @@
 import { resolve, parse, sep } from "path";
-import { DataResult } from "filesrocket";
+import { ResultEntity } from "filesrocket";
 import { promisify } from "util";
 import { stat } from "fs";
 
@@ -10,7 +10,7 @@ const statAsync = promisify(stat);
 export class BaseService {
   constructor(protected readonly options: LocalOptions) {}
 
-  async builder(path: string): Promise<DataResult> {
+  async builder(path: string): Promise<ResultEntity> {
     const fullpath: string = resolve(path);
     const { directory: folder, host } = this.options;
     const { base: filename, ext, dir } = parse(fullpath);

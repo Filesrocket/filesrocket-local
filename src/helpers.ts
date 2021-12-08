@@ -12,14 +12,14 @@ export function paginate<T>(
   const limit: number = Math.floor(size * page);
   const items: any[] = entities.slice(skip, limit);
 
-  const nextPage: number | null = ((skip + size) < entities.length) ? page + 1 : null;
-  const prevPage: number | null = page > 1 ? page - 1 : null;
+  const nextPage = ((skip + size) < entities.length) ? page + 1 : undefined;
+  const prevPage = page > 1 ? page - 1 : undefined;
 
   return {
     items,
     size,
+    page,
     total: entities.length,
-    pageToken: page,
     nextPageToken: nextPage,
     prevPageToken: prevPage
   }

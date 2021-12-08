@@ -1,6 +1,6 @@
-import { ServiceMethods, Paginated,  DataFile, DataResult, Query, DataDir } from "filesrocket";
+import { ServiceMethods, Paginated, FileEntity, ResultEntity, Query } from "filesrocket";
 import { createWriteStream, unlink, readdir, statSync } from "fs";
-import { ParseFilename } from "filesrocket/lib/common";
+import { GenerateFilename, Service } from "filesrocket/lib/common";
 import { promisify } from "util";
 import { resolve } from "path";
 
@@ -8,27 +8,31 @@ const readdirAsync = promisify(readdir);
 const unlinkAsync = promisify(unlink);
 
 import { DirectoryService } from "./directory.service";
+import { BaseService } from "./base.service";
 import { LocalOptions } from "../index";
 import { paginate } from "../helpers";
-import { BaseService } from "./base.service";
 
+@Service({
+  name: "local",
+  type: "Files"
+})
 export class FileService extends BaseService implements Partial<ServiceMethods> {
-  protected directoryService: ServiceMethods<DataDir>;
+  protected directoryService: DirectoryService;
 
   constructor(protected readonly options: LocalOptions) {
     super(options);
     this.directoryService = new DirectoryService(options);
   }
 
-  @ParseFilename()
-  async create(data: DataFile, query: Query = {}): Promise<DataResult> {
+  @GenerateFilename()
+  async create(data: FileEntity, query: Query = {}): Promise<ResultEntity> {
     return new Promise(async (success, failure) => {
       const { path = "" } = query;
-      await this.directoryService.create({ path });
+      await this.directoryService.create({ name: path });
 
       // Fullpath.
       const { directory: folder } = this.options;
-      const fullpath: string = resolve(folder, path, data.filename);
+      const fullpath: string = resolve(folder, path, data.name);
 
       const writable = createWriteStream(fullpath);
 
@@ -40,11 +44,11 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
 
       writable.on("error", err => failure(err));
 
-      data.file.pipe(writable);
+      data.stream.pipe(writable);
     });
   }
 
-  async list(query: Query): Promise<Paginated<DataResult>> {
+  async list(query: Query): Promise<Paginated<ResultEntity>> {
     const { pagination, directory } = this.options;
     let { size, page, path = "" } = query;
 
@@ -59,22 +63,22 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const length: number = pagination.max >= size ? size : pagination.default;
     const paginatedItems: Paginated<unknown> = paginate(filtered, length, page);
 
-    const mapped: Promise<DataResult>[] = paginatedItems.items.map((item) => {
+    const mapped: Promise<ResultEntity>[] = paginatedItems.items.map((item) => {
       return this.get(`${ dir }/${ item }`);
     });
-    const files: DataResult[] = await Promise.all(mapped);
+    const files: ResultEntity[] = await Promise.all(mapped);
 
     return Object.defineProperty(paginatedItems, "items", {
       value: files
-    }) as Paginated<DataResult>;
+    }) as Paginated<ResultEntity>;
   }
 
-  async get(path: string): Promise<DataResult> {
+  async get(path: string): Promise<ResultEntity> {
     const root: string = resolve(path);
     return this.builder(root);
   }
 
-  async remove(path: string): Promise<DataResult> {
+  async remove(path: string): Promise<ResultEntity> {
     const { directory } = this.options;
     const regex = new RegExp(`${ directory }.+`, "g");
 

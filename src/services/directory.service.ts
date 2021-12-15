@@ -74,7 +74,7 @@ export class DirectoryService extends BaseService implements Partial<RocketServi
     return this.builder(path);
   }
 
-  async remove(path: string, query: Query = {}): Promise<ResultEntity> {
+  async remove(path: string): Promise<ResultEntity> {
     const { directory } = this.options;
     const regex = new RegExp(`${ directory }.+`, "g");
 
@@ -82,7 +82,7 @@ export class DirectoryService extends BaseService implements Partial<RocketServi
     const fullpath: string = resolve(dir);
 
     const entity: ResultEntity = await this.get(fullpath);
-    await rmdirAsync(fullpath, { recursive: Boolean(query.bulk) });
+    await rmdirAsync(fullpath);
     return entity;
   }
 

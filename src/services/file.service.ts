@@ -48,7 +48,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     });
   }
 
-  async list(query: Query): Promise<Paginated<ResultEntity>> {
+  async list(query: Query = {}): Promise<Paginated<ResultEntity>> {
     const { pagination, directory } = this.options;
     let { size, page, path = "" } = query;
 

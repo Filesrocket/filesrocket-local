@@ -20,11 +20,13 @@ export class BaseService {
     const chunks: string[] = directory.split(sep);
 
     const stat = await statAsync(fullpath);
+    const url: string = `${ host }/${ chunks.join("/") }/${ filename }`;
 
     return {
+      id: url,
       name: filename,
       ext,
-      url: `${ host }/${ chunks.join("/") }/${ filename }`,
+      url,
       size: stat.size,
       dir: chunks.join("/"),
       createdAt: stat.birthtime,

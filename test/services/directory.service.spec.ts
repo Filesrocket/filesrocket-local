@@ -1,11 +1,5 @@
-import { LocalDirectoryService } from "../../src/index";
+import { directoryService as service } from "../config/rocket";
 jest.mock("filesrocket");
-
-const service = new LocalDirectoryService({
-  pagination: { default: 15, max: 50 },
-  directory: "uploads",
-  host: "http://localhost:3030"
-});
 
 const NAMES: string[] = [
   "images",

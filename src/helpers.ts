@@ -17,7 +17,7 @@ export function paginate<T>(
 
   return {
     items,
-    size,
+    size: items.length,
     page,
     total: entities.length,
     nextPageToken: nextPage,

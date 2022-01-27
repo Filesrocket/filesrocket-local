@@ -1,4 +1,4 @@
-# Filesrocket-local
+# filesrocket-local
 [Filesrocket](https://github.com/IvanZM123/filesrocket) service to manage your files and directories on your own server.
 
 ## Install
@@ -39,11 +39,8 @@ For interact with the files and directories enter to the following enpoints.
 **Directories**: http://localhost:3030/storage/local/directories
 
 ## Examples
-We have also created many repositories with the most popular frameworks for you to play around with, to help as example guides.
+We have created this repository to help as an example guide.
 
 | Framework | Repository |
 | --------- | ---------- |
-| Vue | [filesrocket-vue-app](https://github.com/IvanZM123/filesrocket-vue-app) |
-| Angular | [filesrocket-angular-app](https://github.com/IvanZM123/filesrocket-angular-app) |
-| React | [filesrocket-react-app](https://github.com/IvanZM123/filesrocket-react-app)|
 | Express | [filesrocket-express-app](https://github.com/IvanZM123/filesrocket-express-app) |

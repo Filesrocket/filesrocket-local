@@ -27,11 +27,8 @@
     "test": "jest",
     "test:w": "npm run test -- --watch"
   },
-  "dependencies": {
-    "http-errors": "^1.8.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/http-errors": "^1.8.1",
     "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",

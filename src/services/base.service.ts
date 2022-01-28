@@ -23,7 +23,7 @@ export class BaseService {
     const url: string = `${ host }/${ chunks.join("/") }/${ name }`;
 
     const items: string[] = chunks.slice(1, chunks.length);
-    items.push(name);
+    stat.isDirectory() && items.push(name);
 
     return {
       id: url,

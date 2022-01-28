@@ -1,6 +1,6 @@
 import { ServiceMethods, Paginated, FileEntity, ResultEntity, Query } from "filesrocket";
 import { createWriteStream, unlink, readdir, statSync } from "fs";
-import { GenerateFilename, Service } from "filesrocket/lib/common";
+import { Filename, Service } from "filesrocket/lib/common";
 import { promisify } from "util";
 import { resolve } from "path";
 
@@ -24,7 +24,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     this.directoryService = new DirectoryService(options);
   }
 
-  @GenerateFilename()
+  @Filename()
   async create(data: FileEntity, query: Query = {}): Promise<ResultEntity> {
     return new Promise(async (success, failure) => {
       const { path = "" } = query;

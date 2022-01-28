@@ -1,12 +1,16 @@
-import { LocalDirectoryService, LocalFileService } from "../../src/index";
+import {
+  LocalDirectoryService,
+  LocalFileService,
+  LocalOptions
+} from "../../src/index";
 
-const config = {
+const options: LocalOptions = {
   pagination: { default: 15, max: 50 },
   directory: "uploads",
   host: "http://localhost:3030"
 }
 
 // File Service.
-export const fileService = new LocalFileService(config);
+export const File = new LocalFileService(options);
 // Directory Service.
-export const directoryService = new LocalDirectoryService(config);
+export const Directory = new LocalDirectoryService(options);

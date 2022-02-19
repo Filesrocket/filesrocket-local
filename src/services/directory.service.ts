@@ -14,7 +14,6 @@ const mkdirAsync = promisify(mkdir)
 const rmdirAsync = promisify(rmdir)
 
 @Service({
-  name: 'local',
   type: 'Directories'
 })
 export class DirectoryService extends BaseService implements Partial<RocketService<DirectoryEntity>> {

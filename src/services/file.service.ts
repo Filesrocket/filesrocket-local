@@ -13,7 +13,6 @@ const readdirAsync = promisify(readdir)
 const unlinkAsync = promisify(unlink)
 
 @Service({
-  name: 'local',
   type: 'Files'
 })
 export class FileService extends BaseService implements Partial<ServiceMethods> {

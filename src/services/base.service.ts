@@ -1,5 +1,5 @@
+import { ResultEntity } from '@filesrocket/filesrocket'
 import { resolve, parse, sep } from 'path'
-import { ResultEntity } from 'filesrocket'
 import { promisify } from 'util'
 import { stat } from 'fs'
 

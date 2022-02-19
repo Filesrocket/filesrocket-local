@@ -1,6 +1,12 @@
-import { ServiceMethods, Paginated, FileEntity, ResultEntity, Query } from 'filesrocket'
+import {
+  ServiceMethods,
+  Paginated,
+  FileEntity,
+  ResultEntity,
+  Query
+} from '@filesrocket/filesrocket'
+import { Filename, Service } from '@filesrocket/filesrocket/lib/common'
 import { createWriteStream, unlink, readdir, statSync } from 'fs'
-import { Filename, Service } from 'filesrocket/lib/common'
 import { promisify } from 'util'
 import path from 'path'
 
@@ -15,7 +21,8 @@ const unlinkAsync = promisify(unlink)
 @Service({
   type: 'Files'
 })
-export class FileService extends BaseService implements Partial<ServiceMethods> {
+export class FileService extends BaseService
+  implements Partial<ServiceMethods> {
   protected directoryService: DirectoryService;
 
   constructor (protected readonly options: LocalOptions) {
@@ -41,7 +48,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
         resolve(data)
       })
 
-      writable.on('error', err => reject(err))
+      writable.on('error', (err) => reject(err))
 
       data.stream.pipe(writable)
     })
@@ -54,7 +61,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const dir: string = path.resolve(`${directory}/${root}`)
     const items: string[] = await readdirAsync(dir)
 
-    const filtered: string[] = items.filter(item => {
+    const filtered: string[] = items.filter((item) => {
       const stat = statSync(`${dir}/${item}`)
       return stat.isFile()
     })

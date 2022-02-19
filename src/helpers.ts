@@ -1,4 +1,4 @@
-import { Paginated } from 'filesrocket'
+import { Paginated } from '@filesrocket/filesrocket'
 
 export function paginate<T> (
   entities: T[],

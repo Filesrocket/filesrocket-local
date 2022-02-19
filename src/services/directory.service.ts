@@ -1,7 +1,17 @@
-import { DirectoryEntity, ResultEntity, Paginated, Query, Service as RocketService } from 'filesrocket'
-import { BadRequest, InternalServerError, NotFound } from 'filesrocket/lib/errors'
+import {
+  DirectoryEntity,
+  ResultEntity,
+  Paginated,
+  Query,
+  Service as RocketService
+} from '@filesrocket/filesrocket'
+import {
+  BadRequest,
+  InternalServerError,
+  NotFound
+} from '@filesrocket/filesrocket/lib/errors'
 import { access, mkdir, readdir, statSync, Stats, rmdir } from 'fs'
-import { Service } from 'filesrocket/lib/common'
+import { Service } from '@filesrocket/filesrocket/lib/common'
 import { promisify } from 'util'
 import path from 'path'
 
@@ -16,7 +26,8 @@ const rmdirAsync = promisify(rmdir)
 @Service({
   type: 'Directories'
 })
-export class DirectoryService extends BaseService implements Partial<RocketService<DirectoryEntity>> {
+export class DirectoryService extends BaseService
+  implements Partial<RocketService<DirectoryEntity>> {
   constructor (protected readonly options: LocalOptions) {
     super(options)
   }
@@ -32,9 +43,13 @@ export class DirectoryService extends BaseService implements Partial<RocketServi
     const isExist: boolean = await this.hasExist(root)
     if (isExist) return this.builder(root)
 
-    const fullpath: string | undefined = await mkdirAsync(root, { recursive: true })
+    const fullpath: string | undefined = await mkdirAsync(root, {
+      recursive: true
+    })
     if (!fullpath) {
-      throw new InternalServerError('An error occurred while performing this operation.')
+      throw new InternalServerError(
+        'An error occurred while performing this operation.'
+      )
     }
 
     return this.get(root)
@@ -48,7 +63,7 @@ export class DirectoryService extends BaseService implements Partial<RocketServi
     const fullpath: string = path.resolve(`${directory}/${root}`)
     const items: string[] = await readdirAsync(fullpath)
 
-    const filtered: string[] = items.filter(item => {
+    const filtered: string[] = items.filter((item) => {
       const data: Stats = statSync(`${fullpath}/${item}`)
       return data.isDirectory()
     })
@@ -88,7 +103,7 @@ export class DirectoryService extends BaseService implements Partial<RocketServi
   private async hasExist (root: string): Promise<boolean> {
     return new Promise((resolve) => {
       const fullpath: string = path.resolve(root)
-      access(fullpath, (err) => err ? resolve(false) : resolve(true))
+      access(fullpath, (err) => (err ? resolve(false) : resolve(true)))
     })
   }
 }

@@ -82,7 +82,7 @@ export class DirectoryService extends BaseService
     }) as Paginated<ResultEntity>
   }
 
-  async get (path: string, _?: Query): Promise<ResultEntity> {
+  private async get (path: string, _?: Query): Promise<ResultEntity> {
     const isExist: boolean = await this.hasExist(path)
     if (!isExist) throw new NotFound('The directory not exist.')
     return this.builder(path)

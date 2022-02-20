@@ -21,8 +21,7 @@ const unlinkAsync = promisify(unlink)
 @Service({
   type: 'Files'
 })
-export class FileService extends BaseService
-  implements Partial<ServiceMethods> {
+export class FileService extends BaseService implements Partial<ServiceMethods> {
   protected directoryService: DirectoryService;
 
   constructor (protected readonly options: LocalOptions) {
@@ -79,7 +78,7 @@ export class FileService extends BaseService
     }) as Paginated<ResultEntity>
   }
 
-  async get (root: string): Promise<ResultEntity> {
+  private async get (root: string): Promise<ResultEntity> {
     const fullpath: string = path.resolve(root)
     return this.builder(fullpath)
   }

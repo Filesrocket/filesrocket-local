@@ -10,7 +10,7 @@ const statAsync = promisify(stat)
 export class BaseService {
   constructor (protected readonly options: LocalOptions) {}
 
-  async builder (path: string): Promise<ResultEntity> {
+  protected async builder (path: string): Promise<ResultEntity> {
     const fullpath: string = resolve(path)
     const { directory: folder, host } = this.options
     const { base: name, ext, dir } = parse(fullpath)

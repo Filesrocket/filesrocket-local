@@ -1,7 +1,7 @@
 import { createReadStream } from 'fs'
 import { resolve } from 'path'
 
-import { File } from '../config/rocket'
+import { service } from '../config/rocket'
 jest.mock('@filesrocket/filesrocket')
 
 const FILENAMES = [
@@ -21,7 +21,7 @@ describe('Create files.', () => {
     const results = await Promise.all(
       FILENAMES.map((name) => {
         const path: string = resolve(`test/fixtures/${name}`)
-        return File.create({
+        return service.file.create({
           name,
           stream: createReadStream(path),
           fieldname: 'files',
@@ -37,33 +37,39 @@ describe('Create files.', () => {
 
 describe('Getting files', () => {
   test('Get all files', async () => {
-    const data = await File.list()
-    expect(data.items).toHaveLength(FILENAMES.length)
+    const data = await service.file.list()
+    const items = Array.isArray(data) ? data : data.items
+    expect(items).toHaveLength(FILENAMES.length)
   })
 
   test('Get 3 files', async () => {
     const SIZE: number = 3
-    const data = await File.list({ size: SIZE })
-    expect(data.items).toHaveLength(SIZE)
+
+    const data = await service.file.list({ size: SIZE })
+    const items = Array.isArray(data) ? data : data.items
+
+    expect(items).toHaveLength(SIZE)
   })
 })
 
 describe('Deleting files', () => {
   test('Delete one file', async () => {
-    const data = await File.list({ size: 1 })
-    const file = data.items[0]
+    const data = await service.file.list({ size: 1 })
+    const items = Array.isArray(data) ? data : data.items
+    const file = items[0]
 
-    const entity = await File.remove(file.id)
+    const entity = await service.file.remove(file.url)
     expect(file).toMatchObject(entity)
   })
 
   test('Delete many files', async () => {
-    const data = await File.list()
+    const data = await service.file.list()
+    const items = Array.isArray(data) ? data : data.items
 
     const entities = await Promise.all(
-      data.items.map(item => File.remove(item.id))
+      items.map(item => service.file.remove(item.url))
     )
 
-    expect(entities).toHaveLength(data.items.length)
+    expect(entities).toHaveLength(items.length)
   })
 })

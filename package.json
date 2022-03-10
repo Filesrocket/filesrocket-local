@@ -1,5 +1,5 @@
 {
-  "name": "@filesrocket/local",
+  "name": "filesrocket-local",
   "version": "0.1.0",
   "description": "Filesrocket service that manages your files and directories locally",
   "main": "lib/index.js",

@@ -4,8 +4,8 @@ import {
   FileEntity,
   ResultEntity,
   Query
-} from '@filesrocket/filesrocket'
-import { Filename, Service } from '@filesrocket/filesrocket/lib/common'
+} from 'filesrocket'
+import { Filename, Service } from 'filesrocket/lib/common'
 import { createWriteStream, unlink, readdir, statSync } from 'fs'
 import { promisify } from 'util'
 import path from 'path'

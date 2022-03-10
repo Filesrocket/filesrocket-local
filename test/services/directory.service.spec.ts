@@ -1,5 +1,5 @@
 import { service } from '../config/rocket'
-jest.mock('@filesrocket/filesrocket')
+jest.mock('filesrocket')
 
 const NAMES: string[] = [
   'images',

@@ -4,14 +4,14 @@ import {
   Paginated,
   Query,
   Service as RocketService
-} from '@filesrocket/filesrocket'
+} from 'filesrocket'
 import {
   BadRequest,
   InternalServerError,
   NotFound
-} from '@filesrocket/filesrocket/lib/errors'
+} from 'filesrocket/lib/errors'
 import { access, mkdir, readdir, statSync, Stats, rmdir } from 'fs'
-import { Service } from '@filesrocket/filesrocket/lib/common'
+import { Service } from 'filesrocket/lib/common'
 import { promisify } from 'util'
 import path from 'path'
 

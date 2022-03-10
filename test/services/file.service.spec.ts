@@ -2,7 +2,7 @@ import { createReadStream } from 'fs'
 import { resolve } from 'path'
 
 import { service } from '../config/rocket'
-jest.mock('@filesrocket/filesrocket')
+jest.mock('filesrocket')
 
 const FILENAMES = [
   'one.png',

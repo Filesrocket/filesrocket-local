@@ -1,4 +1,4 @@
-import { Pagination } from '@filesrocket/filesrocket'
+import { Pagination } from 'filesrocket'
 
 export interface LocalOptions {
   pagination: Pagination;

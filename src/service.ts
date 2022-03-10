@@ -3,7 +3,7 @@ import {
   DirectoryManager,
   FileManager,
   ServiceMethods
-} from '@filesrocket/filesrocket/lib'
+} from 'filesrocket'
 
 import { LocalOptions } from './index'
 import { FileService } from './services/file.service'

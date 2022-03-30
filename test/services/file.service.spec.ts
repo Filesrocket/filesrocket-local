@@ -1,8 +1,7 @@
 import { createReadStream } from 'fs'
 import { resolve } from 'path'
 
-import { service } from '../config/rocket'
-jest.mock('filesrocket')
+import { fileService as service } from '../config/rocket'
 
 const FILENAMES = [
   'one.png',
@@ -21,7 +20,7 @@ describe('Create files.', () => {
     const results = await Promise.all(
       FILENAMES.map((name) => {
         const path: string = resolve(`test/fixtures/${name}`)
-        return service.file.create({
+        return service.create({
           name,
           stream: createReadStream(path),
           fieldname: 'files',
@@ -37,7 +36,7 @@ describe('Create files.', () => {
 
 describe('Getting files', () => {
   test('Get all files', async () => {
-    const data = await service.file.list()
+    const data = await service.list()
     const items = Array.isArray(data) ? data : data.items
     expect(items).toHaveLength(FILENAMES.length)
   })
@@ -45,7 +44,7 @@ describe('Getting files', () => {
   test('Get 3 files', async () => {
     const SIZE: number = 3
 
-    const data = await service.file.list({ size: SIZE })
+    const data = await service.list({ size: SIZE })
     const items = Array.isArray(data) ? data : data.items
 
     expect(items).toHaveLength(SIZE)
@@ -54,20 +53,20 @@ describe('Getting files', () => {
 
 describe('Deleting files', () => {
   test('Delete one file', async () => {
-    const data = await service.file.list({ size: 1 })
+    const data = await service.list({ size: 1 })
     const items = Array.isArray(data) ? data : data.items
     const file = items[0]
 
-    const entity = await service.file.remove(file.url)
+    const entity = await service.remove(file.url)
     expect(file).toMatchObject(entity)
   })
 
   test('Delete many files', async () => {
-    const data = await service.file.list()
+    const data = await service.list()
     const items = Array.isArray(data) ? data : data.items
 
     const entities = await Promise.all(
-      items.map(item => service.file.remove(item.url))
+      items.map(item => service.remove(item.url))
     )
 
     expect(entities).toHaveLength(items.length)

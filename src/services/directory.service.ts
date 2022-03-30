@@ -1,51 +1,34 @@
-import {
-  DirectoryEntity,
-  ResultEntity,
-  Paginated,
-  Query,
-  Service as RocketService
-} from 'filesrocket'
-import {
-  BadRequest,
-  InternalServerError,
-  NotFound
-} from 'filesrocket/lib/errors'
+import { InternalServerError, NotFound } from 'filesrocket/lib/errors'
+import { OutputEntity, Paginated, Query, Service } from 'filesrocket'
 import { access, mkdir, readdir, statSync, Stats, rmdir } from 'fs'
-import { Service } from 'filesrocket/lib/common'
 import { promisify } from 'util'
 import path from 'path'
 
-import { LocalOptions } from '../declarations'
 import { BaseService } from './base.service'
+import { Options } from '../declarations'
 import { paginate } from '../helpers'
 
 const readdirAsync = promisify(readdir)
 const mkdirAsync = promisify(mkdir)
 const rmdirAsync = promisify(rmdir)
 
-@Service({
-  type: 'Directories'
-})
-export class DirectoryService extends BaseService
-  implements Partial<RocketService<DirectoryEntity>> {
-  constructor (protected readonly options: LocalOptions) {
+export class DirectoryService extends BaseService implements Partial<Service<any>> {
+  constructor (protected readonly options: Options) {
     super(options)
   }
 
-  async create (data: DirectoryEntity): Promise<ResultEntity> {
-    if (typeof data.name !== 'string') {
-      throw new BadRequest('The name property is a String')
-    }
-
+  async create (data: any): Promise<OutputEntity> {
     const { directory } = this.options
     const root: string = path.resolve(`${directory}/${data.name}`)
 
-    const isExist: boolean = await this.hasExist(root)
+    const isExist = await this.hasExist(root)
+
     if (isExist) return this.builder(root)
 
-    const fullpath: string | undefined = await mkdirAsync(root, {
+    const fullpath = await mkdirAsync(root, {
       recursive: true
     })
+
     if (!fullpath) {
       throw new InternalServerError(
         'An error occurred while performing this operation.'
@@ -55,7 +38,7 @@ export class DirectoryService extends BaseService
     return this.get(root)
   }
 
-  async list (query: Query = {}): Promise<Paginated<ResultEntity>> {
+  async list (query: Query = {}): Promise<Paginated<OutputEntity>> {
     const { directory, pagination } = this.options
     const { size, page, path: root = '' } = query
 
@@ -70,7 +53,7 @@ export class DirectoryService extends BaseService
 
     const itemsPaginated: Paginated<unknown> = paginate(filtered, length, page)
 
-    const directories: ResultEntity[] = await Promise.all(
+    const directories: OutputEntity[] = await Promise.all(
       itemsPaginated.items.map((item) => {
         const root: string = path.resolve(`${fullpath}/${item}`)
         return this.get(root)
@@ -79,31 +62,39 @@ export class DirectoryService extends BaseService
 
     return Object.defineProperty(itemsPaginated, 'items', {
       value: directories
-    }) as Paginated<ResultEntity>
+    }) as Paginated<OutputEntity>
   }
 
-  private async get (path: string, _?: Query): Promise<ResultEntity> {
-    const isExist: boolean = await this.hasExist(path)
-    if (!isExist) throw new NotFound('The directory not exist.')
+  private async get (path: string, query?: Query): Promise<OutputEntity> {
+    const isExist = await this.hasExist(path)
+
+    if (!isExist) {
+      throw new NotFound('Directory not exist')
+    }
+
     return this.builder(path)
   }
 
-  async remove (root: string): Promise<ResultEntity> {
+  async remove (root: string): Promise<OutputEntity> {
     const { directory } = this.options
     const regex = new RegExp(`${directory}.+`, 'g')
 
     const [dir] = root.match(regex) || ['']
-    const fullpath: string = path.resolve(dir)
+    const fullpath = path.resolve(dir)
 
-    const entity: ResultEntity = await this.get(fullpath)
+    const entity = await this.get(fullpath)
+
     await rmdirAsync(fullpath)
+
     return entity
   }
 
   private async hasExist (root: string): Promise<boolean> {
     return new Promise((resolve) => {
-      const fullpath: string = path.resolve(root)
-      access(fullpath, (err) => (err ? resolve(false) : resolve(true)))
+      const fullpath = path.resolve(root)
+      access(fullpath, (err) =>
+        (err ? resolve(false) : resolve(true))
+      )
     })
   }
 }

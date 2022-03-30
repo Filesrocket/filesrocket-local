@@ -1,16 +1,16 @@
-import { ResultEntity } from 'filesrocket'
+import { OutputEntity } from 'filesrocket'
 import { resolve, parse, sep } from 'path'
 import { promisify } from 'util'
 import { stat } from 'fs'
 
-import { LocalOptions } from '../declarations'
+import { Options } from '../declarations'
 
 const statAsync = promisify(stat)
 
 export class BaseService {
-  constructor (protected readonly options: LocalOptions) {}
+  constructor (protected readonly options: Options) {}
 
-  protected async builder (path: string): Promise<ResultEntity> {
+  protected async builder (path: string): Promise<OutputEntity> {
     const fullpath: string = resolve(path)
     const { directory: folder, host } = this.options
     const { base: name, ext, dir } = parse(fullpath)

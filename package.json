@@ -1,16 +1,18 @@
 {
   "name": "filesrocket-local",
   "version": "0.1.0",
-  "description": "Filesrocket service that manages your files and directories locally",
+  "description": "Filesrocket service that manages your files locally",
   "main": "lib/index.js",
   "types": "lib",
   "author": {
     "name": "Ivan Zaldivar",
-    "email": "ivanzaldivar16@gmail.com",
     "url": "https://github.com/IvanZM123"
   },
   "repository": {
-    "url": "https://github.com/IvanZM123/filesrocket-local"
+    "url": "https://github.com/Filesrocket/filesrocket-local"
+  },
+  "bugs": {
+    "url": "https://github.com/Filesrocket/filesrocket-local/issues"
   },
   "keywords": [
     "filemanager",
@@ -21,7 +23,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "npm run test && npm run lint && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint --fix . --ext .ts",
     "test": "jest",

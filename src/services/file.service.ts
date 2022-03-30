@@ -1,36 +1,31 @@
 import {
   ServiceMethods,
+  OutputEntity,
   Paginated,
-  FileEntity,
-  ResultEntity,
+  InputFile,
   Query
 } from 'filesrocket'
-import { Filename, Service } from 'filesrocket/lib/common'
 import { createWriteStream, unlink, readdir, statSync } from 'fs'
 import { promisify } from 'util'
 import path from 'path'
 
 import { DirectoryService } from './directory.service'
 import { BaseService } from './base.service'
-import { LocalOptions } from '../index'
 import { paginate } from '../helpers'
+import { Options } from '../index'
 
 const readdirAsync = promisify(readdir)
 const unlinkAsync = promisify(unlink)
 
-@Service({
-  type: 'Files'
-})
 export class FileService extends BaseService implements Partial<ServiceMethods> {
   protected directoryService: DirectoryService;
 
-  constructor (protected readonly options: LocalOptions) {
+  constructor (protected readonly options: Options) {
     super(options)
     this.directoryService = new DirectoryService(options)
   }
 
-  @Filename()
-  async create (data: FileEntity, query: Query = {}): Promise<ResultEntity> {
+  async create (data: InputFile, query: Query = {}): Promise<OutputEntity> {
     const { path: root = '' } = query
     await this.directoryService.create({ name: root })
 
@@ -53,7 +48,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     })
   }
 
-  async list (query: Query = {}): Promise<Paginated<ResultEntity>> {
+  async list (query: Query = {}): Promise<Paginated<OutputEntity>> {
     const { pagination, directory } = this.options
     const { size, page, path: root = '' } = query
 
@@ -68,22 +63,22 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const length: number = pagination.max >= size ? size : pagination.default
     const paginatedItems: Paginated<unknown> = paginate(filtered, length, page)
 
-    const mapped: Promise<ResultEntity>[] = paginatedItems.items.map((item) => {
+    const mapped: Promise<OutputEntity>[] = paginatedItems.items.map((item) => {
       return this.get(`${dir}/${item}`)
     })
-    const files: ResultEntity[] = await Promise.all(mapped)
+    const files: OutputEntity[] = await Promise.all(mapped)
 
     return Object.defineProperty(paginatedItems, 'items', {
       value: files
-    }) as Paginated<ResultEntity>
+    }) as Paginated<OutputEntity>
   }
 
-  private async get (root: string): Promise<ResultEntity> {
+  private async get (root: string): Promise<OutputEntity> {
     const fullpath: string = path.resolve(root)
     return this.builder(fullpath)
   }
 
-  async remove (root: string): Promise<ResultEntity> {
+  async remove (root: string): Promise<OutputEntity> {
     const { directory } = this.options
     const regex = new RegExp(`${directory}.+`, 'g')
 

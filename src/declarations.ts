@@ -1,6 +1,6 @@
 import { Pagination } from 'filesrocket'
 
-export interface LocalOptions {
+export interface Options {
   pagination: Pagination;
   directory: string;
   host: string;

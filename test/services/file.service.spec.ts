@@ -71,4 +71,9 @@ describe('Deleting files', () => {
 
     expect(entities).toHaveLength(items.length)
   })
+
+  test('Delete a file that does not exist', async () => {
+    const promise = service.remove('http://localhost:3030/uploads/randomfile.txt')
+    await expect(promise).rejects.toThrowError('The file does not exists')
+  })
 })

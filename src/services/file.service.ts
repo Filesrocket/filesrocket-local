@@ -6,6 +6,7 @@ import {
   Query
 } from 'filesrocket'
 import { createWriteStream, unlink, readdir, statSync } from 'fs'
+import { NotFound } from 'filesrocket/lib/errors'
 import { promisify } from 'util'
 import path from 'path'
 
@@ -36,7 +37,6 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     return new Promise((resolve, reject) => {
       const writable = createWriteStream(fullpath)
 
-      // Listening events.
       writable.on('finish', async () => {
         const data = await this.get(fullpath)
         resolve(data)
@@ -53,6 +53,11 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const { size, page, path: root = '' } = query
 
     const dir: string = path.resolve(`${directory}/${root}`)
+
+    const isExist = await this.hasExist(dir)
+
+    if (!isExist) return paginate([], 0)
+
     const items: string[] = await readdirAsync(dir)
 
     const filtered: string[] = items.filter((item) => {
@@ -74,7 +79,12 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
   }
 
   private async get (root: string): Promise<OutputEntity> {
+    const isExist = await this.hasExist(path.resolve(root))
+
+    if (!isExist) throw new NotFound('The file does not exists')
+
     const fullpath: string = path.resolve(root)
+
     return this.builder(fullpath)
   }
 
@@ -89,6 +99,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const file = await this.get(fullpath)
 
     await unlinkAsync(fullpath)
+
     return file
   }
 }

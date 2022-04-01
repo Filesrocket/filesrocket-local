@@ -1,6 +1,6 @@
 import { InternalServerError, NotFound } from 'filesrocket/lib/errors'
 import { OutputEntity, Paginated, Query, Service } from 'filesrocket'
-import { access, mkdir, readdir, statSync, Stats, rmdir } from 'fs'
+import { mkdir, readdir, statSync, Stats, rmdir } from 'fs'
 import { promisify } from 'util'
 import path from 'path'
 
@@ -65,14 +65,14 @@ export class DirectoryService extends BaseService implements Partial<Service<any
     }) as Paginated<OutputEntity>
   }
 
-  private async get (path: string, query?: Query): Promise<OutputEntity> {
-    const isExist = await this.hasExist(path)
+  private async get (root: string, query?: Query): Promise<OutputEntity> {
+    const isExist = await this.hasExist(root)
 
     if (!isExist) {
       throw new NotFound('Directory not exist')
     }
 
-    return this.builder(path)
+    return this.builder(root)
   }
 
   async remove (root: string): Promise<OutputEntity> {
@@ -87,14 +87,5 @@ export class DirectoryService extends BaseService implements Partial<Service<any
     await rmdirAsync(fullpath)
 
     return entity
-  }
-
-  private async hasExist (root: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      const fullpath = path.resolve(root)
-      access(fullpath, (err) =>
-        (err ? resolve(false) : resolve(true))
-      )
-    })
   }
 }

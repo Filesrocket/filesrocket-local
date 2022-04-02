@@ -1,6 +1,6 @@
 {
   "name": "filesrocket-local",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Filesrocket service that manages your files locally",
   "main": "lib/index.js",
   "types": "lib",

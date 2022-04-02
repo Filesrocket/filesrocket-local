@@ -2,7 +2,7 @@ import {
   ServiceMethods,
   OutputEntity,
   Paginated,
-  InputFile,
+  InputEntity,
   Query
 } from 'filesrocket'
 import { createWriteStream, unlink, readdir, statSync } from 'fs'
@@ -26,7 +26,7 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     this.directoryService = new DirectoryService(options)
   }
 
-  async create (data: InputFile, query: Query = {}): Promise<OutputEntity> {
+  async create (data: InputEntity, query: Query = {}): Promise<OutputEntity> {
     const { path: root = '' } = query
     await this.directoryService.create({ name: root })
 

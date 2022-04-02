@@ -1,6 +1,6 @@
 {
   "name": "filesrocket-local",
-  "version": "0.1.1",
+  "version": "0.0.0",
   "description": "Filesrocket service that manages your files locally",
   "main": "lib/index.js",
   "types": "lib",
@@ -29,7 +29,9 @@
     "test": "jest",
     "test:w": "npm run test -- --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "filesrocket": "^0.0.2"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.10.1",

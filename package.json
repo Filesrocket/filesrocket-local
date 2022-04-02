@@ -1,6 +1,6 @@
 {
   "name": "filesrocket-local",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Filesrocket service that manages your files locally",
   "main": "lib/index.js",
   "types": "lib",
@@ -21,6 +21,14 @@
     "storage",
     "files"
   ],
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "LICENCE",
+    "README.md",
+    "lib/**"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "npm run test && npm run lint && tsc -p .",
@@ -30,7 +38,7 @@
     "test:w": "npm run test -- --watch"
   },
   "dependencies": {
-    "filesrocket": "^0.0.2"
+    "filesrocket": "^0.0.4"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",

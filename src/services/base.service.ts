@@ -1,6 +1,6 @@
 import { OutputEntity } from 'filesrocket'
-import { promisify } from 'util'
 import { stat, access } from 'fs'
+import { promisify } from 'util'
 import path from 'path'
 
 import { Options } from '../declarations'
@@ -10,6 +10,10 @@ const statAsync = promisify(stat)
 export class BaseService {
   constructor (protected readonly options: Options) {}
 
+  /**
+   * Method responsible for constructing the entities (Files)
+   * @param root Path
+   */
   protected async builder (root: string): Promise<OutputEntity> {
     const fullpath: string = path.resolve(root)
     const { directory: folder, host } = this.options
@@ -37,6 +41,26 @@ export class BaseService {
     }
   }
 
+  /**
+   * Method responsible for parsing the HTTP URL to path
+   *
+   * For example: `http://domain.com/uploads/images/filesrocket.png` -> `uploads/images/filesrocket.png`
+   *
+   * @param root Path or URL
+   */
+  protected resolvePath (root: string): string {
+    const { directory } = this.options
+    const regex = new RegExp(`${directory}.+`, 'g')
+
+    const [dir] = root.match(regex) || ['']
+
+    return path.resolve(dir)
+  }
+
+  /**
+   * Responsible method if entity exists (Files or Directories)
+   * @param root Path
+   */
   protected async hasExist (root: string): Promise<boolean> {
     return new Promise((resolve) => {
       const fullpath = path.resolve(root)

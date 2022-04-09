@@ -1,5 +1,5 @@
+import { OutputEntity, Paginated, Query, ServiceMethods } from 'filesrocket'
 import { InternalServerError, NotFound } from 'filesrocket/lib/errors'
-import { OutputEntity, Paginated, Query, Service } from 'filesrocket'
 import { mkdir, readdir, statSync, Stats, rmdir } from 'fs'
 import { promisify } from 'util'
 import path from 'path'
@@ -12,7 +12,9 @@ const readdirAsync = promisify(readdir)
 const mkdirAsync = promisify(mkdir)
 const rmdirAsync = promisify(rmdir)
 
-export class DirectoryService extends BaseService implements Partial<Service<any>> {
+type Service = Partial<ServiceMethods<any>>;
+
+export class DirectoryService extends BaseService implements Service {
   constructor (protected readonly options: Options) {
     super(options)
   }
@@ -31,7 +33,7 @@ export class DirectoryService extends BaseService implements Partial<Service<any
 
     if (!fullpath) {
       throw new InternalServerError(
-        'An error occurred while performing this operation.'
+        'An error occurred while performing this operation'
       )
     }
 
@@ -65,22 +67,18 @@ export class DirectoryService extends BaseService implements Partial<Service<any
     }) as Paginated<OutputEntity>
   }
 
-  private async get (root: string, query?: Query): Promise<OutputEntity> {
-    const isExist = await this.hasExist(root)
+  async get (id: string, query: Query = {}): Promise<OutputEntity> {
+    const fullpath = this.resolvePath(id)
 
-    if (!isExist) {
-      throw new NotFound('Directory not exist')
-    }
+    const isExist = await this.hasExist(fullpath)
 
-    return this.builder(root)
+    if (!isExist) throw new NotFound('Directory does not exist')
+
+    return this.builder(fullpath)
   }
 
   async remove (root: string): Promise<OutputEntity> {
-    const { directory } = this.options
-    const regex = new RegExp(`${directory}.+`, 'g')
-
-    const [dir] = root.match(regex) || ['']
-    const fullpath = path.resolve(dir)
+    const fullpath = this.resolvePath(root)
 
     const entity = await this.get(fullpath)
 

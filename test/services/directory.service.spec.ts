@@ -1,4 +1,4 @@
-import { directoryService as service } from '../config/rocket'
+import { directoryService as service } from '../config/service'
 
 const NAMES: string[] = [
   'images',

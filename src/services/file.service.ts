@@ -78,25 +78,21 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     }) as Paginated<OutputEntity>
   }
 
-  private async get (root: string): Promise<OutputEntity> {
-    const isExist = await this.hasExist(path.resolve(root))
+  async get (id: string, query: Query = {}): Promise<OutputEntity> {
+    const fullpath = this.resolvePath(id)
 
-    if (!isExist) throw new NotFound('The file does not exists')
+    const isExist = await this.hasExist(fullpath)
 
-    const fullpath: string = path.resolve(root)
+    if (!isExist) throw new NotFound('File does not exist')
 
     return this.builder(fullpath)
   }
 
-  async remove (root: string): Promise<OutputEntity> {
-    const { directory } = this.options
-    const regex = new RegExp(`${directory}.+`, 'g')
-
-    const [dir] = root.match(regex) || ['']
-    const fullpath: string = path.resolve(dir)
+  async remove (id: string, query: Query = {}): Promise<OutputEntity> {
+    const fullpath = this.resolvePath(id)
 
     // Get file before remove.
-    const file = await this.get(fullpath)
+    const file = await this.get(id)
 
     await unlinkAsync(fullpath)
 

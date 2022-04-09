@@ -1,6 +1,6 @@
 {
   "name": "filesrocket-local",
-  "version": "0.1.2",
+  "version": "0.0.2",
   "description": "Filesrocket service that manages your files locally",
   "main": "lib/index.js",
   "types": "lib",
@@ -14,6 +14,14 @@
   "bugs": {
     "url": "https://github.com/Filesrocket/filesrocket-local/issues"
   },
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib/**",
+    "README.md",
+    "LICENCE"
+  ],
   "keywords": [
     "filemanager",
     "filemanagement",
@@ -23,13 +31,15 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run test && npm run lint && tsc -p .",
+    "build": "npm run lint && npm run test && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint --fix . --ext .ts",
     "test": "jest",
     "test:w": "npm run test -- --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "filesrocket": "^0.0.6"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.10.1",

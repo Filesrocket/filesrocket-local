@@ -1,4 +1,7 @@
 # filesrocket-local
+
+[![npm version](https://badge.fury.io/js/filesrocket-local.svg)](https://badge.fury.io/js/filesrocket-local) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 [Filesrocket](https://github.com/Filesrocket/filesrocket-local) service to manage your files on your own server.
 
 ## Install

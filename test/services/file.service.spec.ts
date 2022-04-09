@@ -1,7 +1,8 @@
+import { OutputEntity } from 'filesrocket'
 import { createReadStream } from 'fs'
 import { resolve } from 'path'
 
-import { fileService as service } from '../config/rocket'
+import { fileService as service } from '../config/service'
 
 const FILENAMES = [
   'one.png',
@@ -20,13 +21,16 @@ describe('Create files.', () => {
     const results = await Promise.all(
       FILENAMES.map((name) => {
         const path: string = resolve(`test/fixtures/${name}`)
-        return service.create({
+
+        const payload = {
           name,
           stream: createReadStream(path),
           fieldname: 'files',
           encoding: '',
           mimetype: ''
-        })
+        }
+
+        return service.create(payload)
       })
     )
 
@@ -48,6 +52,18 @@ describe('Getting files', () => {
     const items = Array.isArray(data) ? data : data.items
 
     expect(items).toHaveLength(SIZE)
+  })
+
+  test('Get one file', async () => {
+    const data = await service.list({})
+
+    const element = data.items.at(0) as OutputEntity
+
+    const entity = await service.get(element?.url || '')
+
+    expect(entity.id).toBe(element.id)
+    expect(entity).toEqual(element)
+    expect(entity).toBeTruthy()
   })
 })
 
@@ -74,6 +90,6 @@ describe('Deleting files', () => {
 
   test('Delete a file that does not exist', async () => {
     const promise = service.remove('http://localhost:3030/uploads/randomfile.txt')
-    await expect(promise).rejects.toThrowError('The file does not exists')
+    await expect(promise).rejects.toThrowError('File does not exist')
   })
 })

@@ -68,14 +68,15 @@ export class FileService extends BaseService implements Partial<ServiceMethods> 
     const length: number = pagination.max >= size ? size : pagination.default
     const paginatedItems: Paginated<unknown> = paginate(filtered, length, page)
 
-    const mapped: Promise<OutputEntity>[] = paginatedItems.items.map((item) => {
-      return this.get(`${dir}/${item}`)
-    })
-    const files: OutputEntity[] = await Promise.all(mapped)
+    const files: OutputEntity[] = await Promise.all(
+      paginatedItems.items.map((item) => this.get(`${dir}/${item}`))
+    )
 
-    return Object.defineProperty(paginatedItems, 'items', {
-      value: files
-    }) as Paginated<OutputEntity>
+    return Object.defineProperty(
+      paginatedItems,
+      'items',
+      { value: files }
+    ) as Paginated<OutputEntity>
   }
 
   async get (id: string, query: Query = {}): Promise<OutputEntity> {

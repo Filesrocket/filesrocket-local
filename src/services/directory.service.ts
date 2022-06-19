@@ -62,9 +62,11 @@ export class DirectoryService extends BaseService implements Service {
       })
     )
 
-    return Object.defineProperty(itemsPaginated, 'items', {
-      value: directories
-    }) as Paginated<OutputEntity>
+    return Object.defineProperty(
+      itemsPaginated,
+      'items',
+      { value: directories }
+    ) as Paginated<OutputEntity>
   }
 
   async get (id: string, query: Query = {}): Promise<OutputEntity> {
